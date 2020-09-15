@@ -1,0 +1,18 @@
+SUBSCRIPTION_NAME=infrastructure-sandbox
+
+alias h=helm
+alias k=kubectl
+alias tf=terraform
+alias v=vault
+
+alias azlogin="az login --username ${AZURE_USERNAME} --password ${AZURE_PASSWORD}"
+alias azsetsub="az account set --subscription $SUBSCRIPTION_NAME"
+
+azlogin
+azsetsub
+
+export AZURE_SUBSCRIPTION_ID=$(az account list --output tsv --query "[?name=='$SUBSCRIPTION_NAME'].id")
+export AZURE_TENANT_ID=$(az account list --output tsv --query "[?name=='$SUBSCRIPTION_NAME'].tenantId")
+
+#client_id=$AZURE_CLIENT_ID \
+#client_secret=$AZURE_CLIENT_SECRET

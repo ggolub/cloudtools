@@ -2,8 +2,12 @@ SUBSCRIPTION_NAME=infrastructure-sandbox
 
 alias h=helm
 alias k=kubectl
-alias tf=terraform
 alias v=vault
+
+alias tf=terraform
+alias tfa='terraform apply'
+alias tfd='terraform destroy'
+alias tfi='terraform init'
 
 alias azlogin="az login --username ${AZURE_USERNAME} --password ${AZURE_PASSWORD}"
 alias azsetsub="az account set --subscription $SUBSCRIPTION_NAME"
@@ -16,3 +20,6 @@ export AZURE_TENANT_ID=$(az account list --output tsv --query "[?name=='$SUBSCRI
 
 #client_id=$AZURE_CLIENT_ID \
 #client_secret=$AZURE_CLIENT_SECRET
+
+alias aks_login="az aks get-credentials --name aks-app-srevault-sandbox-useast2 --resource-group app-srevault-sandbox-useast2 --subscription us-infrastructure-dev"
+#vault_url = "https://vault.infra-sandbox-vault.nonprod.us.lnrisk.io"[0m[0m

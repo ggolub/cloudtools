@@ -9,6 +9,7 @@ ENV K8S_VERSION 1.19.0
 ENV PS_VERSION 7.0.3
 ENV TF_VERSION 0.13.2
 ENV VAULT_VERSION 1.5.3
+ENV KUBECONFIG=/host_kube_dir/config
 
 # set the working directory
 WORKDIR /app
@@ -34,47 +35,52 @@ RUN apk update && \
 
 # install kubectl
 #RUN curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-RUN curl -L https://storage.googleapis.com/kubernetes-release/release/v${K8S_VERSION}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl \
- && chmod +x /usr/local/bin/kubectl
+RUN curl -L https://storage.googleapis.com/kubernetes-release/release/v${K8S_VERSION}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && \
+    chmod +x /usr/local/bin/kubectl
 
 # install helm
-RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
- && chmod 700 get_helm.sh \
- && ./get_helm.sh \
- && rm ./get_helm.sh \
- && rm /var/cache/apk/*
+RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 && \
+    chmod 700 get_helm.sh && \
+    ./get_helm.sh && \
+    rm ./get_helm.sh && \
+    rm /var/cache/apk/*
 
 # install vault
-RUN wget https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip \
- && unzip ./vault_${VAULT_VERSION}_linux_amd64.zip -d /usr/local/bin \
- && rm -f ./vault_${VAULT_VERSION}_linux_amd64.zip
+RUN ZIPFILE=vault_${VAULT_VERSION}_linux_amd64.zip && \
+    wget https://releases.hashicorp.com/vault/${VAULT_VERSION}/${ZIPFILE} && \
+    unzip ./${ZIPFILE} -d /usr/local/bin && \
+    rm -f ./${ZIPFILE}
+
+# install terraform
+RUN ZIPFILE=terraform_${TF_VERSION}_linux_amd64.zip && \
+    wget https://releases.hashicorp.com/terraform/${TF_VERSION}/${ZIPFILE} && \
+    unzip ./${ZIPFILE} -d /usr/local/bin && \
+    rm -f ./${ZIPFILE}
 
 # fetch the PowerShell tar and install PowerShell
-RUN curl -L https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/powershell-${PS_VERSION}-linux-alpine-x64.tar.gz -o /tmp/powershell.tar.gz \
- && mkdir -p /opt/microsoft/powershell/7 \
- && tar zxf /tmp/powershell.tar.gz -C /opt/microsoft/powershell/7 \
- && chmod +x /opt/microsoft/powershell/7/pwsh \
- && ln -s /opt/microsoft/powershell/7/pwsh /usr/bin/pwsh \
- && rm /tmp/powershell.tar.gz
+RUN curl -L https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/powershell-${PS_VERSION}-linux-alpine-x64.tar.gz -o /tmp/powershell.tar.gz && \
+    mkdir -p /opt/microsoft/powershell/7 && \
+    tar zxf /tmp/powershell.tar.gz -C /opt/microsoft/powershell/7 && \
+    chmod +x /opt/microsoft/powershell/7/pwsh && \
+    ln -s /opt/microsoft/powershell/7/pwsh /usr/bin/pwsh && \
+    rm /tmp/powershell.tar.gz
 
 # add the Azure module
 RUN echo 'Install-Module -Name Az -AllowClobber -Confirm:$False -Force' | pwsh
 
-# install terraform
-RUN wget https://releases.hashicorp.com/terraform/$TF_VERSION/terraform_${TF_VERSION}_linux_amd64.zip \
- && unzip ./terraform_${TF_VERSION}_linux_amd64.zip -d /usr/local/bin \
- && rm -f ./terraform_${TF_VERSION}_linux_amd64.zip
-
-RUN echo 'export SUBSCRIPTION_NAME="infrastructure-sandbox"' >> ~/.bashrc
-
 COPY ./bootstrap.rc /root/.bootstrap.rc
-RUN echo 'source ~/.bootstrap.rc' >> ~/.bashrc
+RUN echo '' >> ~/.bashrc && \
+    echo "source ~/.bootstrap.rc" >> ~/.bashrc
 
 # save a hidden copy of this file inside the image
 COPY Dockerfile /.Dockerfile
 
-RUN  mkdir /root/.ssh
+#ENV SUBSCRIPTION_NAME infrastructure-sandbox
+ENV SUBSCRIPTION_NAME us-infrastructure-dev
+
 COPY keys/* /root/.ssh/
-RUN  chmod -R 600 /root/.ssh
+RUN mkdir ~/.kube && \
+    touch ~/.kube/config && \
+    chmod -R 600 ~/
 
 ENTRYPOINT ["/bin/bash"]

@@ -1,8 +1,17 @@
-SUBSCRIPTION_NAME=infrastructure-sandbox
+export SUBSCRIPTION_NAME=infrastructure-sandbox
+
+export VAULT_SKIP_VERIFY=true
+export VAULT_ADDR='https://vault.infra-sandbox-vault.nonprod.us.lnrisk.io'
+
+export VAULT_USERNAME=goluga01
 
 alias h=helm
-alias k=kubectl
 alias v=vault
+
+alias vlogin="vault login -method=userpass username=$VAULT_USERNAME"
+
+alias k=kubectl
+alias kgp='kubectl get pods'
 
 alias tf=terraform
 alias tfa='terraform apply'
@@ -17,9 +26,8 @@ azsetsub
 
 export AZURE_SUBSCRIPTION_ID=$(az account list --output tsv --query "[?name=='$SUBSCRIPTION_NAME'].id")
 export AZURE_TENANT_ID=$(az account list --output tsv --query "[?name=='$SUBSCRIPTION_NAME'].tenantId")
-
+#
 #client_id=$AZURE_CLIENT_ID \
 #client_secret=$AZURE_CLIENT_SECRET
 
-alias aks_login="az aks get-credentials --name aks-app-srevault-sandbox-useast2 --resource-group app-srevault-sandbox-useast2 --subscription us-infrastructure-dev"
-#vault_url = "https://vault.infra-sandbox-vault.nonprod.us.lnrisk.io"[0m[0m
+#alias aks_login="az aks get-credentials --name aks-app-srevault-sandbox-useast2 --resource-group app-srevault-sandbox-useast2 --subscription us-infrastructure-dev"

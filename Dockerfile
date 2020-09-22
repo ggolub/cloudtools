@@ -49,7 +49,8 @@ RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master
 RUN ZIPFILE=vault_${VAULT_VERSION}_linux_amd64.zip && \
     wget https://releases.hashicorp.com/vault/${VAULT_VERSION}/${ZIPFILE} && \
     unzip ./${ZIPFILE} -d /usr/local/bin && \
-    rm -f ./${ZIPFILE}
+    rm -f ./${ZIPFILE} && \
+    vault -autocomplete-install
 
 # install terraform
 RUN ZIPFILE=terraform_${TF_VERSION}_linux_amd64.zip && \

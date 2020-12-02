@@ -7,6 +7,7 @@ export VAULT_USERNAME=goluga01
 
 alias h=helm
 alias v=vault
+alias s=sentinel
 
 alias vlogin="vault login -method=userpass username=$VAULT_USERNAME"
 

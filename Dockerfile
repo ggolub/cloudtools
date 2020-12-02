@@ -9,6 +9,7 @@ ENV K8S_VERSION 1.19.0
 ENV PS_VERSION 7.0.3
 ENV TF_VERSION 0.13.2
 ENV VAULT_VERSION 1.5.3
+ENV SENTINEL_VERSION 0.16.1
 ENV KUBECONFIG=/host_kube_dir/config
 
 # set the working directory
@@ -45,12 +46,18 @@ RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master
     rm ./get_helm.sh && \
     rm /var/cache/apk/*
 
-# install vault
+# install vault cli
 RUN ZIPFILE=vault_${VAULT_VERSION}_linux_amd64.zip && \
     wget https://releases.hashicorp.com/vault/${VAULT_VERSION}/${ZIPFILE} && \
     unzip ./${ZIPFILE} -d /usr/local/bin && \
     rm -f ./${ZIPFILE} && \
     vault -autocomplete-install
+
+# install sentinel cli
+RUN ZIPFILE=sentinel_${SENTINEL_VERSION}_linux_amd64.zip && \
+    wget https://releases.hashicorp.com/sentinel/${SENTINEL_VERSION}/${ZIPFILE} && \
+    unzip ./${ZIPFILE} -d /usr/local/bin && \
+    rm -f ./${ZIPFILE}
 
 # install terraform
 RUN ZIPFILE=terraform_${TF_VERSION}_linux_amd64.zip && \
@@ -83,5 +90,8 @@ COPY keys/* /root/.ssh/
 RUN mkdir ~/.kube && \
     touch ~/.kube/config && \
     chmod -R 600 ~/
+
+# remove shells to prevent interactive use of the container
+#RUN /bin/rm -R /bin/bash /bin/sh
 
 ENTRYPOINT ["/bin/bash"]

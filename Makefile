@@ -8,6 +8,7 @@
 # 	rm key.bin
 
 build :
+	rm -rf keys
 	mkdir keys
 	cp ~/.ssh/id_rsa ~/.ssh/id_rsa.pub keys
 	docker-compose build

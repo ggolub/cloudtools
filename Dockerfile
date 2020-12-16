@@ -9,6 +9,7 @@ ENV K8S_VERSION 1.19.0
 ENV PS_VERSION 7.0.3
 ENV TF_VERSION 0.13.2
 ENV VAULT_VERSION 1.5.3
+ENV FLUX_VERSION 1.21.0
 ENV SENTINEL_VERSION 0.16.1
 ENV KUBECONFIG=/host_kube_dir/config
 
@@ -59,11 +60,15 @@ RUN ZIPFILE=sentinel_${SENTINEL_VERSION}_linux_amd64.zip && \
     unzip ./${ZIPFILE} -d /usr/local/bin && \
     rm -f ./${ZIPFILE}
 
-# install terraform
+# install terraform cli
 RUN ZIPFILE=terraform_${TF_VERSION}_linux_amd64.zip && \
     wget https://releases.hashicorp.com/terraform/${TF_VERSION}/${ZIPFILE} && \
     unzip ./${ZIPFILE} -d /usr/local/bin && \
     rm -f ./${ZIPFILE}
+
+# install flux cli
+RUN wget https://github.com/fluxcd/flux/releases/download/${FLUX_VERSION}/fluxctl_linux_amd64 -O /usr/local/bin/fluxctl && \
+    chmod +x /usr/local/bin/fluxctl
 
 # fetch the PowerShell tar and install PowerShell
 RUN curl -L https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/powershell-${PS_VERSION}-linux-alpine-x64.tar.gz -o /tmp/powershell.tar.gz && \

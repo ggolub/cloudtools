@@ -70,6 +70,9 @@ RUN ZIPFILE=terraform_${TF_VERSION}_linux_amd64.zip && \
 RUN wget https://github.com/fluxcd/flux/releases/download/${FLUX_VERSION}/fluxctl_linux_amd64 -O /usr/local/bin/fluxctl && \
     chmod +x /usr/local/bin/fluxctl
 
+# install linkerd cli
+RUN curl -sL https://run.linkerd.io/install | sh
+
 # fetch the PowerShell tar and install PowerShell
 RUN curl -L https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/powershell-${PS_VERSION}-linux-alpine-x64.tar.gz -o /tmp/powershell.tar.gz && \
     mkdir -p /opt/microsoft/powershell/7 && \
